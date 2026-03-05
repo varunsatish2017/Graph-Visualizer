@@ -48,6 +48,7 @@ function Controls({ nodes, onAdd }) {
         >
           <option value="Add Vertices (comma separated)">Add Vertices (comma separated)</option>
           <option value="Add Edge">Add Edge</option>
+          <option value="Add Arc">Add Arc</option>
         </select>
       </div>
 
