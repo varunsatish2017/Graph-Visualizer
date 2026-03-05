@@ -17,10 +17,10 @@ test('renders Controls with action dropdown', () => {
   expect(screen.getByLabelText('Action')).toBeInTheDocument();
 });
 
-test('shows Node Name input when Add Vertex is selected', () => {
+test('shows Node Name input when Add Vertices (comma separated) is selected', () => {
   render(<App />);
   const select = screen.getByLabelText('Action');
-  fireEvent.change(select, { target: { value: 'Add Vertex' } });
+  fireEvent.change(select, { target: { value: 'Add Vertices (comma separated)' } });
   expect(screen.getByLabelText('Node Name')).toBeInTheDocument();
 });
 

@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 
 function Controls({ nodes, onAdd }) {
-  const [action, setAction] = useState('Add Vertex');
-  const [nodeName, setNodeName] = useState('');
+  const [action, setAction] = useState('Add Vertices (comma separated)');
+  const [nodeNames, setNodeName] = useState('');
   const [source, setSource] = useState('');
   const [target, setTarget] = useState('');
+  const [disabledNodes, setNodeDisabled] = useState([]) //[For edges] a node is disabled if already connected to n - 1 nodes
 
   const canAddEdge = nodes.length >= 2;
 
   function handleEnter() {
-    if (action === 'Add Vertex') {
-      if (!nodeName.trim()) return;
-      onAdd({ type: 'vertex', name: nodeName.trim() });
+    if (action === 'Add Vertices (comma separated)') {
+      if (!nodeNames.trim()) return;
+      nodeNames
+        .split(',')
+        .map(name => name.trim())
+        .filter(name => name)
+        .forEach(name => onAdd({ type: 'vertex', name }));
       setNodeName('');
     } else {
       if (!source.trim() || !target.trim()) return;
@@ -41,21 +46,21 @@ function Controls({ nodes, onAdd }) {
           onChange={handleActionChange}
           style={styles.select}
         >
-          <option value="Add Vertex">Add Vertex</option>
+          <option value="Add Vertices (comma separated)">Add Vertices (comma separated)</option>
           <option value="Add Edge">Add Edge</option>
         </select>
       </div>
 
       {/* State 2: Dynamic inputs */}
-      {action === 'Add Vertex' ? (
+      {action === 'Add Vertices (comma separated)' ? (
         <div style={styles.field}>
-          <label htmlFor="node-name" style={styles.label}>Node Name</label>
+          <label htmlFor="node-name" style={styles.label}>Node Name(s)</label>
           <input
             id="node-name"
             type="text"
-            value={nodeName}
+            value={nodeNames}
             onChange={(e) => setNodeName(e.target.value)}
-            placeholder="e.g. A"
+            placeholder="e.g. A, B, C"
             style={styles.input}
           />
         </div>
@@ -63,27 +68,33 @@ function Controls({ nodes, onAdd }) {
         <>
           <div style={styles.field}>
             <label htmlFor="edge-source" style={styles.label}>Source</label>
-            <input
+            <select
               id="edge-source"
-              type="text"
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              placeholder="e.g. A"
               disabled={!canAddEdge}
-              style={styles.input}
-            />
+              style={styles.select}
+            >
+              <option value="">Select source node</option>
+              {nodes.map(node => (
+                <option key={node.id} value={node.id}>{node.id}</option>
+              ))}
+            </select>
           </div>
           <div style={styles.field}>
             <label htmlFor="edge-target" style={styles.label}>Target</label>
-            <input
+            <select
               id="edge-target"
-              type="text"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              placeholder="e.g. B"
               disabled={!canAddEdge}
-              style={styles.input}
-            />
+              style={styles.select}
+            >
+              <option value="">Select target node</option>
+              {nodes.map(node => (
+                <option key={node.id} value={node.id}>{node.id}</option>
+              ))}
+            </select>
           </div>
           {!canAddEdge && (
             <p style={styles.hint}>Add at least 2 nodes before adding an edge.</p>

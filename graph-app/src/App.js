@@ -7,19 +7,19 @@ import './App.css';
 
 // Initial demo graph – positions are managed by D3 force simulation
 const INITIAL_NODES = [
-  { id: 'A', label: 'A' },
-  { id: 'B', label: 'B' },
-  { id: 'C', label: 'C' },
-  { id: 'D', label: 'D' },
-  { id: 'E', label: 'E' },
+  // { id: 'A', label: 'A' },
+  // { id: 'B', label: 'B' },
+  // { id: 'C', label: 'C' },
+  // { id: 'D', label: 'D' },
+  // { id: 'E', label: 'E' },
 ];
 
 const INITIAL_EDGES = [
-  { source: 'A', target: 'B' },
-  { source: 'B', target: 'C' },
-  { source: 'C', target: 'D' },
-  { source: 'D', target: 'E' },
-  { source: 'E', target: 'A' },
+  // { source: 'A', target: 'B' },
+  // { source: 'B', target: 'C' },
+  // { source: 'C', target: 'D' },
+  // { source: 'D', target: 'E' },
+  // { source: 'E', target: 'A' },
 ];
 
 function App() {
