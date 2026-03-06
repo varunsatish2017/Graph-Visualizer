@@ -9,6 +9,20 @@ function Controls({ nodes, onAdd }) {
 
   const canAddEdge = nodes.length >= 2;
 
+  function handleAddArc() {
+    // TODO: Implement arc functionality
+    if (!source.trim() || !target.trim()) return;
+    
+    // Placeholder for arc-specific logic
+    console.log('Adding arc from', source.trim(), 'to', target.trim());
+    
+    // For now, you can implement the arc logic here
+    onAdd({ type: 'arc', source: source.trim(), target: target.trim() });
+    
+    setSource('');
+    setTarget('');
+  }
+
   function handleEnter() {
     if (action === 'Add Vertices (comma separated)') {
       if (!nodeNames.trim()) return;
@@ -18,11 +32,13 @@ function Controls({ nodes, onAdd }) {
         .filter(name => name)
         .forEach(name => onAdd({ type: 'vertex', name }));
       setNodeName('');
-    } else {
+    } else if (action === 'Add Edge') {
       if (!source.trim() || !target.trim()) return;
       onAdd({ type: 'edge', source: source.trim(), target: target.trim() });
       setSource('');
       setTarget('');
+    } else if (action === 'Add Arc') {
+      handleAddArc();
     }
   }
 
@@ -106,7 +122,7 @@ function Controls({ nodes, onAdd }) {
       {/* State 3: Enter button */}
       <button
         onClick={handleEnter}
-        disabled={action === 'Add Edge' && !canAddEdge}
+        disabled={(action === 'Add Edge' || action === 'Add Arc') && !canAddEdge}
         style={styles.button}
       >
         Enter

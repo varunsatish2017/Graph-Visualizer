@@ -44,7 +44,7 @@ function App() {
         alert('Target node "' + target + '" does not exist.');
         return;
       }
-      setEdges((prev) => [...prev, { source, target }]);
+      setEdges((prev) => [...prev, { source, target, type }]);
     }
   }
 

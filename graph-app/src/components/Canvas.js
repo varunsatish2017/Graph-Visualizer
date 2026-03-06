@@ -5,7 +5,26 @@ const NODE_RADIUS = 20;
 const NODE_COLOR = '#4a90d9';
 const HIGHLIGHTED_COLOR = 'gold';
 const EDGE_COLOR = '#555';
+const ARC_COLOR = '#d94a4a';
 const TEXT_COLOR = '#fff';
+
+// Helper function to draw arrow head
+function drawArrowHead(ctx, fromX, fromY, toX, toY, headSize = 8) {
+  const angle = Math.atan2(toY - fromY, toX - fromX);
+  
+  ctx.beginPath();
+  ctx.moveTo(toX, toY);
+  ctx.lineTo(
+    toX - headSize * Math.cos(angle - Math.PI / 6),
+    toY - headSize * Math.sin(angle - Math.PI / 6)
+  );
+  ctx.moveTo(toX, toY);
+  ctx.lineTo(
+    toX - headSize * Math.cos(angle + Math.PI / 6),
+    toY - headSize * Math.sin(angle + Math.PI / 6)
+  );
+  ctx.stroke();
+}
 
 function drawGraph(ctx, simNodes, edges, highlightedNodeId, width, height) {
   ctx.clearRect(0, 0, width, height);
@@ -14,17 +33,47 @@ function drawGraph(ctx, simNodes, edges, highlightedNodeId, width, height) {
   const posMap = {};
   simNodes.forEach((n) => { posMap[n.id] = { x: n.x, y: n.y }; });
 
-  // Draw edges
-  edges.forEach(({ source, target }) => {
+  // Draw edges and arcs
+  edges.forEach(({ source, target, type }) => {
     const src = posMap[source];
     const tgt = posMap[target];
     if (!src || !tgt) return;
+    
+    // Calculate shortened line to stop at node edge, not center
+    const dx = tgt.x - src.x;
+    const dy = tgt.y - src.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    if (distance === 0) return;
+    
+    const unitX = dx / distance;
+    const unitY = dy / distance;
+    
+    // Adjust start and end points to node edges
+    const startX = src.x + unitX * NODE_RADIUS;
+    const startY = src.y + unitY * NODE_RADIUS;
+    const endX = tgt.x - unitX * NODE_RADIUS;
+    const endY = tgt.y - unitY * NODE_RADIUS;
+    
     ctx.beginPath();
-    ctx.moveTo(src.x, src.y);
-    ctx.lineTo(tgt.x, tgt.y);
-    ctx.strokeStyle = EDGE_COLOR;
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    
+    if (type === 'arc') {
+      ctx.strokeStyle = ARC_COLOR;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      
+      // Draw arrow head for arcs
+      ctx.strokeStyle = ARC_COLOR;
+      ctx.lineWidth = 2;
+      drawArrowHead(ctx, startX, startY, endX, endY);
+    } else {
+      // Default to edge (line)
+      ctx.strokeStyle = EDGE_COLOR;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
   });
 
   // Draw nodes
