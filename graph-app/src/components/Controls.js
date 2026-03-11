@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 function Controls({ nodes, onAdd }) {
   const [action, setAction] = useState('Add Vertices (comma separated)');
   const [nodeNames, setNodeName] = useState('');
   const [source, setSource] = useState('');
   const [target, setTarget] = useState('');
-  const [disabledNodes, setNodeDisabled] = useState([]) //[For edges] a node is disabled if already connected to n - 1 nodes
+  const adjacencyList = useRef({}); // Maps node ID -> array of neighbor IDs
 
-  const canAddEdge = nodes.length >= 2;
+  const canAddEdge = () => {
+    //add if there isn't already an edge/arc with the source and target
+    return nodes.length >= 2;
+  };
+
+  const canAddArc = () => {
+    //add if there isn't an edge/arc with this source and target
+    return nodes.length >= 2;
+  };
+
+  //only keep a node in a dropdown if its "eligible"
+  const nodeEnabled = (node) => {
+    return true;
+  }
 
   function handleAddArc() {
     // TODO: Implement arc functionality
@@ -18,7 +31,22 @@ function Controls({ nodes, onAdd }) {
     
     // For now, you can implement the arc logic here
     onAdd({ type: 'arc', source: source.trim(), target: target.trim() });
-    
+
+    adjacencyList.current[source].push(target.trim());
+    setSource('');
+    setTarget('');
+  }
+
+  function handleAddEdge() {
+    if (!source.trim() || !target.trim()) return;
+
+    onAdd({ type: 'edge', source: source.trim(), target: target.trim() });
+
+    adjacencyList.current[source].push(target.trim());
+    adjacencyList.current[target].push(source.trim());
+
+    console.log('Adding arc from', source.trim(), 'to', target.trim());
+
     setSource('');
     setTarget('');
   }
@@ -30,13 +58,15 @@ function Controls({ nodes, onAdd }) {
         .split(',')
         .map(name => name.trim())
         .filter(name => name)
-        .forEach(name => onAdd({ type: 'vertex', name }));
-      setNodeName('');
+        .forEach(name => {
+          if (!adjacencyList.current[name]) {
+            adjacencyList.current[name] = []; // Initialize the empty array for this new vertex
+          }
+          onAdd({ type: 'vertex', name });
+        });
+      setNodeName(''); //resets text field
     } else if (action === 'Add Edge') {
-      if (!source.trim() || !target.trim()) return;
-      onAdd({ type: 'edge', source: source.trim(), target: target.trim() });
-      setSource('');
-      setTarget('');
+      handleAddEdge();
     } else if (action === 'Add Arc') {
       handleAddArc();
     }
@@ -89,7 +119,7 @@ function Controls({ nodes, onAdd }) {
               id="edge-source"
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              disabled={!canAddEdge}
+              disabled={!canAddEdge()}
               style={styles.select}
             >
               <option value="">Select source node</option>
@@ -104,7 +134,7 @@ function Controls({ nodes, onAdd }) {
               id="edge-target"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              disabled={!canAddEdge}
+              disabled={!canAddEdge()}
               style={styles.select}
             >
               <option value="">Select target node</option>
@@ -113,7 +143,7 @@ function Controls({ nodes, onAdd }) {
               ))}
             </select>
           </div>
-          {!canAddEdge && (
+          {!canAddEdge() && (
             <p style={styles.hint}>Add at least 2 nodes before adding an edge.</p>
           )}
         </>
@@ -122,7 +152,7 @@ function Controls({ nodes, onAdd }) {
       {/* State 3: Enter button */}
       <button
         onClick={handleEnter}
-        disabled={(action === 'Add Edge' || action === 'Add Arc') && !canAddEdge}
+        disabled={(action === 'Add Edge' || action === 'Add Arc') && !canAddEdge()}
         style={styles.button}
       >
         Enter
