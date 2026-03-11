@@ -9,18 +9,33 @@ function Controls({ nodes, onAdd }) {
 
   const canAddEdge = () => {
     //add if there isn't already an edge/arc with the source and target
-    return nodes.length >= 2;
+    return nodes.length >= 2 && source && target && source !== target;
   };
 
   const canAddArc = () => {
     //add if there isn't an edge/arc with this source and target
-    return nodes.length >= 2;
+    return nodes.length >= 2 && source && target && source !== target;
   };
 
   //only keep a node in a dropdown if its "eligible"
-  const nodeEnabled = (node) => {
+  const nodeEnabled_source = () => {
+    const adjList = adjacencyList.current[source];
+    if (adjList && adjList.length >= nodes.length - 1) {
+      return false;
+    }
     return true;
   }
+
+  const nodeEnabled_target = () => {
+    let numPointedAt = 0;
+    for (const key in adjacencyList.current) {
+      const neighbors = adjacencyList.current[key];
+      if (key !== source && neighbors.includes(source)) {
+        numPointedAt += 1;
+      }
+    }
+    return source && numPointedAt < nodes.length - 1;
+  };
 
   function handleAddArc() {
     // TODO: Implement arc functionality
