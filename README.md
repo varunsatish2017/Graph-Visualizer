@@ -10,4 +10,4 @@ Intended to help CSE 101 students understand BFS and DFS traversal for the progr
 
 ## Sample UI
 
-<image-card alt="Graph UI" src="graphUI.png" ></image-card>
+![Image](https://github.com/varunsatish2017/Graph-Visualizer/blob/main/graphUI.png)
