@@ -79,6 +79,14 @@ function App() {
     });
   }
 
+  function handleClearAllVertices() {
+    // TODO: Implement clear-all-vertices behavior.
+  }
+
+  function handleClearAllEdges() {
+    // TODO: Implement clear-all-edges behavior.
+  }
+
   return (
     <div style={styles.page}>
       <TopBar handleDFS={handleDFS} handleBFS={handleBFS} />
@@ -86,7 +94,13 @@ function App() {
       <div style={styles.body}>
         {/* Left: Canvas */}
         <div style={styles.canvasArea}>
-          <Canvas nodes={nodes} edges={edges} highlightedNodeId={highlightedNodeId} />
+          <Canvas
+            nodes={nodes}
+            edges={edges}
+            highlightedNodeId={highlightedNodeId}
+            onClearAllVertices={handleClearAllVertices}
+            onClearAllEdges={handleClearAllEdges}
+          />
         </div>
 
         {/* Right: Controls */}

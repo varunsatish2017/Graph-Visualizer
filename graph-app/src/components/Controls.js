@@ -9,12 +9,12 @@ function Controls({ nodes, onAdd }) {
 
   const canAddEdge = () => {
     //add if there isn't already an edge/arc with the source and target
-    return nodes.length >= 2 && source && target && source !== target;
+    return nodes.length >= 2;
   };
 
   const canAddArc = () => {
     //add if there isn't an edge/arc with this source and target
-    return nodes.length >= 2 && source && target && source !== target;
+    return nodes.length >= 2;
   };
 
   //only keep a node in a dropdown if its "eligible"
@@ -34,7 +34,7 @@ function Controls({ nodes, onAdd }) {
         numPointedAt += 1;
       }
     }
-    return source && numPointedAt < nodes.length - 1;
+    return numPointedAt < nodes.length - 1;
   };
 
   function handleAddArc() {

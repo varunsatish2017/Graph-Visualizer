@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as d3 from 'd3';
 
 const NODE_RADIUS = 20;
@@ -95,9 +95,16 @@ function drawGraph(ctx, simNodes, edges, highlightedNodeId, width, height) {
   });
 }
 
-function Canvas({ nodes, edges, highlightedNodeId }) {
+function Canvas({
+  nodes,
+  edges,
+  highlightedNodeId,
+  onClearAllVertices,
+  onClearAllEdges,
+}) {
   const canvasRef = useRef(null);
   const simRef = useRef(null);
+  const [isClearMenuOpen, setIsClearMenuOpen] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -154,14 +161,108 @@ function Canvas({ nodes, edges, highlightedNodeId }) {
   }, [highlightedNodeId, edges]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={600}
-      height={500}
-      style={{ border: '1px solid #ccc', background: '#fafafa', borderRadius: 6 }}
-      aria-label="Graph canvas"
-    />
+    <div style={styles.wrapper}>
+      <div style={styles.clearMenuContainer}>
+        <button
+          type="button"
+          style={styles.clearButton}
+          onClick={() => setIsClearMenuOpen((prev) => !prev)}
+        >
+          <span style={styles.clearIcon} aria-hidden="true">🗑</span>
+          Clear
+        </button>
+        {isClearMenuOpen && (
+          <div style={styles.clearDropdown}>
+            <button
+              type="button"
+              style={styles.clearOption}
+              onClick={() => {
+                onClearAllVertices();
+                setIsClearMenuOpen(false);
+              }}
+            >
+              Clear All Vertices
+            </button>
+            <button
+              type="button"
+              style={styles.clearOption}
+              onClick={() => {
+                onClearAllEdges();
+                setIsClearMenuOpen(false);
+              }}
+            >
+              Clear All Edges
+            </button>
+          </div>
+        )}
+      </div>
+
+      <canvas
+        ref={canvasRef}
+        width={600}
+        height={500}
+        style={styles.canvas}
+        aria-label="Graph canvas"
+      />
+    </div>
   );
 }
+
+const styles = {
+  wrapper: {
+    position: 'relative',
+    width: 'fit-content',
+  },
+  canvas: {
+    border: '1px solid #ccc',
+    background: '#fafafa',
+    borderRadius: 6,
+  },
+  clearMenuContainer: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 1,
+  },
+  clearButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    background: '#ffe6e6',
+    color: '#b00020',
+    border: '1px solid #f2b8b8',
+    borderRadius: 4,
+    padding: '6px 10px',
+    fontSize: 13,
+    cursor: 'pointer',
+  },
+  clearIcon: {
+    fontSize: 12,
+    lineHeight: 1,
+  },
+  clearDropdown: {
+    position: 'absolute',
+    top: 'calc(100% + 6px)',
+    right: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    background: '#fff5f5',
+    border: '1px solid #f2b8b8',
+    borderRadius: 4,
+    minWidth: 170,
+    boxShadow: '0 6px 14px rgba(0, 0, 0, 0.12)',
+    overflow: 'hidden',
+  },
+  clearOption: {
+    textAlign: 'left',
+    padding: '8px 10px',
+    background: 'transparent',
+    color: '#b00020',
+    border: 'none',
+    borderBottom: '1px solid #f2b8b8',
+    cursor: 'pointer',
+    fontSize: 13,
+  },
+};
 
 export default Canvas;
