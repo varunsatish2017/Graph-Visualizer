@@ -87,6 +87,26 @@ function App() {
     // TODO: Implement clear-all-edges behavior.
   }
 
+  function removeVertex(vertex) {
+    const vertexId = (vertex || '').trim();
+    if (!vertexId) return;
+
+    setNodes((prev) => prev.filter((node) => node.id !== vertexId));
+    setEdges((prev) =>
+      prev.filter((edge) => edge.source !== vertexId && edge.target !== vertexId)
+    );
+
+    if (highlightedNodeId === vertexId) {
+      setHighlightedNodeId(null);
+    }
+
+    setVisitedLog((prev) => prev.filter((id) => id !== vertexId));
+
+    //iterate through each key (and its adjacency list)
+    //if the current one is key, clear key from the list
+    //otherwise iterate through the adjacency list and remove key if it's there
+  }
+
   return (
     <div style={styles.page}>
       <TopBar handleDFS={handleDFS} handleBFS={handleBFS} />
