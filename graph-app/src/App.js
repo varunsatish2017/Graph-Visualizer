@@ -4,6 +4,7 @@ import Controls from './components/Controls';
 import TopBar from './components/TopBar';
 import Results from './components/Results';
 import './App.css';
+import Graph from './Graph';
 
 // Initial demo graph – positions are managed by D3 force simulation
 const INITIAL_NODES = [
@@ -104,7 +105,8 @@ function App() {
 
     //iterate through each key (and its adjacency list)
     //if the current one is key, clear key from the list
-    //otherwise iterate through the adjacency list and remove key if it's there
+    //otherwise iterate through the adjacency list and remove key if it's there\
+    
   }
 
   return (
