@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Canvas from './components/Canvas';
 import Controls from './components/Controls';
 import TopBar from './components/TopBar';
 import Results from './components/Results';
 import './App.css';
-import Graph from './Graph';
+// import Graph from './Graph';
 
 // Initial demo graph – positions are managed by D3 force simulation
 const INITIAL_NODES = [
@@ -26,6 +26,7 @@ const INITIAL_EDGES = [
 function App() {
   const [nodes, setNodes] = useState(INITIAL_NODES);
   const [edges, setEdges] = useState(INITIAL_EDGES);
+  const adjacencyList = useRef({});
   const [highlightedNodeId, setHighlightedNodeId] = useState(null);
   const [visitedLog, setVisitedLog] = useState([]);
 
@@ -36,6 +37,9 @@ function App() {
         return;
       }
       setNodes((prev) => [...prev, { id: name, label: name }]);
+      if (!adjacencyList.current[name]) {
+        adjacencyList.current[name] = [];
+      }
     } else {
       if (!nodes.find((n) => n.id === source)) {
         alert('Source node "' + source + '" does not exist.');
@@ -46,6 +50,22 @@ function App() {
         return;
       }
       setEdges((prev) => [...prev, { source, target, type }]);
+      const next = adjacencyList.current;
+      next[source] = next[source] || [];
+      next[target] = next[target] || [];
+
+      if (type === 'arc') {
+        if (!next[source].includes(target)) {
+          next[source].push(target);
+        }
+      } else {
+        if (!next[source].includes(target)) {
+          next[source].push(target);
+        }
+        if (!next[target].includes(source)) {
+          next[target].push(source);
+        }
+      }
     }
   }
 
@@ -102,11 +122,12 @@ function App() {
     }
 
     setVisitedLog((prev) => prev.filter((id) => id !== vertexId));
-
-    //iterate through each key (and its adjacency list)
-    //if the current one is key, clear key from the list
-    //otherwise iterate through the adjacency list and remove key if it's there\
-    
+    delete adjacencyList.current[vertexId];
+    Object.keys(adjacencyList.current).forEach((key) => {
+      adjacencyList.current[key] = (adjacencyList.current[key] || []).filter(
+        (neighbor) => neighbor !== vertexId
+      );
+    });
   }
 
   return (

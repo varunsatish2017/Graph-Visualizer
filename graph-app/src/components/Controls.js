@@ -1,11 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 
 function Controls({ nodes, onAdd }) {
   const [action, setAction] = useState('Add Vertices (comma separated)');
   const [nodeNames, setNodeName] = useState('');
   const [source, setSource] = useState('');
   const [target, setTarget] = useState('');
-  const adjacencyList = useRef({}); // Maps node ID -> array of neighbor IDs
 
   const canAddEdge = () => {
     //add if there isn't already an edge/arc with the source and target
@@ -17,26 +16,6 @@ function Controls({ nodes, onAdd }) {
     return nodes.length >= 2;
   };
 
-  //only keep a node in a dropdown if its "eligible"
-  const nodeEnabled_source = () => {
-    const adjList = adjacencyList.current[source];
-    if (adjList && adjList.length >= nodes.length - 1) {
-      return false;
-    }
-    return true;
-  }
-
-  const nodeEnabled_target = () => {
-    let numPointedAt = 0;
-    for (const key in adjacencyList.current) {
-      const neighbors = adjacencyList.current[key];
-      if (key !== source && neighbors.includes(source)) {
-        numPointedAt += 1;
-      }
-    }
-    return numPointedAt < nodes.length - 1;
-  };
-
   function handleAddArc() {
     // TODO: Implement arc functionality
     if (!source.trim() || !target.trim()) return;
@@ -46,8 +25,6 @@ function Controls({ nodes, onAdd }) {
     
     // For now, you can implement the arc logic here
     onAdd({ type: 'arc', source: source.trim(), target: target.trim() });
-
-    adjacencyList.current[source].push(target.trim());
     setSource('');
     setTarget('');
   }
@@ -56,9 +33,6 @@ function Controls({ nodes, onAdd }) {
     if (!source.trim() || !target.trim()) return;
 
     onAdd({ type: 'edge', source: source.trim(), target: target.trim() });
-
-    adjacencyList.current[source].push(target.trim());
-    adjacencyList.current[target].push(source.trim());
 
     console.log('Adding arc from', source.trim(), 'to', target.trim());
 
@@ -74,9 +48,6 @@ function Controls({ nodes, onAdd }) {
         .map(name => name.trim())
         .filter(name => name)
         .forEach(name => {
-          if (!adjacencyList.current[name]) {
-            adjacencyList.current[name] = []; // Initialize the empty array for this new vertex
-          }
           onAdd({ type: 'vertex', name });
         });
       setNodeName(''); //resets text field
