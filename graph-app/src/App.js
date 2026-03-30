@@ -67,6 +67,7 @@ function App() {
         }
       }
     }
+    console.log("Adjacency list: ", adjacencyList);
   }
 
   // DFS: receives a user-provided traversal order string
@@ -101,11 +102,22 @@ function App() {
   }
 
   function handleClearAllVertices() {
-    // TODO: Implement clear-all-vertices behavior.
+    setNodes([]);
+    setEdges([]);
+    setHighlightedNodeId(null);
+    setVisitedLog([]);
+    adjacencyList.current = {};
+
+    console.log("Adjacency list (after cleared): ", adjacencyList);
   }
 
   function handleClearAllEdges() {
-    // TODO: Implement clear-all-edges behavior.
+    setEdges([]);
+    adjacencyList.current = Object.keys(adjacencyList.current).reduce((acc, vertex) => {
+      acc[vertex] = [];
+      return acc;
+    }, {});
+    console.log("Adjacency list (after cleared): ", adjacencyList);
   }
 
   function removeVertex(vertex) {
