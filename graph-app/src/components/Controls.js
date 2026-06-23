@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Controls({ nodes, onAdd }) {
+function Controls({ nodes, edges = [], onAdd }) {
   const [action, setAction] = useState('Add Vertices (comma separated)');
   const [nodeNames, setNodeName] = useState('');
   const [source, setSource] = useState('');
@@ -34,7 +34,7 @@ function Controls({ nodes, onAdd }) {
 
     onAdd({ type: 'edge', source: source.trim(), target: target.trim() });
 
-    console.log('Adding arc from', source.trim(), 'to', target.trim());
+    console.log('Adding edge from', source.trim(), 'to', target.trim());
 
     setSource('');
     setTarget('');
@@ -120,13 +120,31 @@ function Controls({ nodes, onAdd }) {
               id="edge-target"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
-              disabled={!canAddEdge()}
+              disabled={!canAddEdge() || !source}
               style={styles.select}
             >
               <option value="">Select target node</option>
-              {nodes.map(node => (
-                <option key={node.id} value={node.id}>{node.id}</option>
-              ))}
+              {nodes.map(node => {
+                // Exclude the source node itself
+                if (node.id === source) return null;
+                // Exclude nodes already connected to source
+                const alreadyConnected = edges.some(e => {
+                  if (action === 'Add Arc') {
+                    // Directed: only outgoing edges from source count
+                    return e.source === source && e.target === node.id;
+                  }
+                  // Undirected: either direction
+                  return (
+                    (e.source === source && e.target === node.id) ||
+                    (e.target === source && e.source === node.id)
+                  );
+                });
+                return (
+                  <option key={node.id} value={node.id} disabled={alreadyConnected}>
+                    {node.id}{alreadyConnected ? ' (already connected)' : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
           {!canAddEdge() && (

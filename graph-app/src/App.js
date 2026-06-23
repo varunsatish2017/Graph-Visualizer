@@ -160,7 +160,7 @@ function App() {
 
         {/* Right: Controls */}
         <div style={styles.sidebar}>
-          <Controls nodes={nodes} onAdd={handleAdd} />
+          <Controls nodes={nodes} edges={edges} onAdd={handleAdd} />
         </div>
       </div>
 
