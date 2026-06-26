@@ -132,6 +132,11 @@ function Canvas({
     simRef.current = simulation;
 
     simulation.on('tick', () => {
+      // Clamp all nodes within canvas boundaries
+      simNodes.forEach((node) => {
+        node.x = Math.max(NODE_RADIUS, Math.min(width - NODE_RADIUS, node.x));
+        node.y = Math.max(NODE_RADIUS, Math.min(height - NODE_RADIUS, node.y));
+      });
       drawGraph(ctx, simNodes, edges, highlightedNodeId, width, height);
     });
 
