@@ -142,6 +142,25 @@ function App() {
     });
   }
 
+  function removeEdge(deleteEdgeSource, deleteEdgeTarget) {
+    if (!deleteEdgeSource || !deleteEdgeTarget) return;
+    console.log('Deleting edge/arc between', deleteEdgeSource, 'and', deleteEdgeTarget);
+
+    // TODO: Remove the edge/arc from the adjacency list here.
+    // Go to "deleteEdgeSource"s adj list and remove "deleteEdgeTarget"
+
+    adjacencyList.current[deleteEdgeSource] = 
+      adjacencyList.current[deleteEdgeSource].filter(id => id !== deleteEdgeTarget);
+
+    // From "deleteEdgeTarget"s adj list, remove "deleteEdgeSource" if present
+    adjacencyList.current[deleteEdgeTarget] = 
+      adjacencyList.current[deleteEdgeTarget].filter(id => id !== deleteEdgeSource);
+
+    setEdges((prev) =>
+      prev.filter((edge) => (edge.source !== deleteEdgeSource || edge.target !== deleteEdgeTarget))
+    );
+  }
+
   return (
     <div style={styles.page}>
       <TopBar handleDFS={handleDFS} handleBFS={handleBFS} />
@@ -160,7 +179,7 @@ function App() {
 
         {/* Right: Controls */}
         <div style={styles.sidebar}>
-          <Controls nodes={nodes} edges={edges} onAdd={handleAdd} />
+          <Controls nodes={nodes} edges={edges} onAdd={handleAdd} onDeleteVertex={removeVertex} onDeleteEdge={removeEdge} adjacencyList={adjacencyList} />
         </div>
       </div>
 

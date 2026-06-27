@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Controls({ nodes, edges = [], onAdd, onDelete }) {
+function Controls({ nodes, edges = [], onAdd, onDeleteVertex, onDeleteEdge }) {
   const [action, setAction] = useState('Add Vertices (comma separated)');
   const [nodeNames, setNodeName] = useState('');
   const [source, setSource] = useState('');
@@ -44,19 +44,17 @@ function Controls({ nodes, edges = [], onAdd, onDelete }) {
   }
 
   function handleDeleteVertex() {
-    if (!deleteVertex) return;
     console.log('Deleting vertex:', deleteVertex);
 
-    // TODO: Remove vertex and its incident edges from the adjacency list here.
+    onDeleteVertex(deleteVertex);
 
     setDeleteVertex('');
   }
 
   function handleDeleteEdge() {
-    if (!deleteEdgeSource || !deleteEdgeTarget) return;
-    console.log('Deleting edge/arc between', deleteEdgeSource, 'and', deleteEdgeTarget);
+    console.log('Deleting edge:', deleteEdgeSource);
 
-    // TODO: Remove the edge/arc from the adjacency list here.
+    onDeleteEdge(deleteEdgeSource, deleteEdgeTarget);
 
     setDeleteEdgeSource('');
     setDeleteEdgeTarget('');
