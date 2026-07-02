@@ -15,37 +15,52 @@ class Graph {
 
   // Returns a list of vertices in BFS traversal order starting from startVertex
   bfs(startVertex) {
-    // TODO: Implement BFS traversal
+    bfsList = [];
+    notDone = [];
+    bfsList.push(startVertex);
+    notDone.push(this.#adjacencyList[startVertex]);
+    while (notDone.length > 0) {
+      const curr = notDone.shift();
+      bfsList.push(curr);
+      notDone.push(this.#adjacencyList[curr]);
+    }
+    return bfsList;
   }
 
   // Adds a vertex to the graph
   addVertex(vertex) {
-    // TODO: Implement adding a vertex
+    this.#adjacencyList[vertex] = [];
   }
 
   // Removes a vertex from the graph (and all its connected edges)
   removeVertex(vertex) {
-    // TODO: Implement removing a vertex
+    delete this.#adjacencyList[vertex];
+    //iterate through remaining keys and remove vertex from their respective adjacency lists
+    Object.keys(this.#adjacencyList).forEach(key => {
+      this.#adjacencyList[key] = this.#adjacencyList[key].filter(v => v !== vertex);
+    });
   }
 
   // Adds an edge between two vertices
   addEdge(source, target) {
-    // TODO: Implement adding an edge
+    this.#adjacencyList[source].push(target);
+    this.#adjacencyList[target].push(source);
   }
 
   // Removes an edge between two vertices
   removeEdge(source, target) {
-    // TODO: Implement removing an edge
+    this.#adjacencyList[source] = this.#adjacencyList[source].filter(targ => targ !== target);
+    this.#adjacencyList[target] = this.#adjacencyList[target].filter(src => src !== source);
   }
 
   // Returns a list of all vertices in the graph
   getVertices() {
-    // TODO: Implement getting all vertices
+    return this.#adjacencyList.keys();
   }
 
   // Returns a list of neighbors for a given vertex
   getNeighbors(vertex) {
-    // TODO: Implement getting neighbors of a vertex
+    return this.#adjacencyList[vertex];
   }
 
   // Returns the adjacency list representation
