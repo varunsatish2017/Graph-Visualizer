@@ -17,9 +17,10 @@ class Graph {
   bfs(startVertex) {
     bfsList = [];
     notDone = [];
+    numVertices = this.getVertices().length;
     bfsList.push(startVertex);
     notDone.push(this.#adjacencyList[startVertex]);
-    while (notDone.length > 0) {
+    while (notDone.length > 0 && bfsList.length < numVertices) {
       const curr = notDone.shift();
       bfsList.push(curr);
       notDone.push(this.#adjacencyList[curr]);
