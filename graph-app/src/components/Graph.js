@@ -4,13 +4,21 @@ class Graph {
 
   #adjacencyList;
   constructor(adjList = {}) {
-    // TODO: Initialize the graph with the provided adjacency list
     this.#adjacencyList = adjList;
   }
 
   // Returns a list of vertices in DFS traversal order starting from startVertex
   dfs(startVertex) {
-    // TODO: Implement DFS traversal
+    // Pre-order DFS Traversal
+    dfsList = [];
+    dfsList.push(startVertex);
+    nodesToComplete = this.#adjacencyList[startVertex].filter(node => node !== startVertex);
+
+    //finish traversal by popping first node off "nodesToComplete",
+    //pushing that to dfsList, and then adding that node's neighbors to
+    //the start of nodesToComplete ... repeats until nodesToComplete
+    //is empty
+
   }
 
   // Returns a list of vertices in BFS traversal order starting from startVertex
