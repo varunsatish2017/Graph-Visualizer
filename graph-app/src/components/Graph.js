@@ -19,10 +19,16 @@ class Graph {
     //the start of nodesToComplete ... repeats until nodesToComplete
     //is empty
 
+    console.log("Inital nodes to complete (DFS): " + nodesToComplete);
+    let visited = [startVertex];
+
     while (nodesToComplete.length > 0) {
       const next = nodesToComplete.shift();
+      visited.push(next);
       dfsList.push(next);
-      nodesToComplete.unshift(...this.#adjacencyList[next]);
+      nodesToComplete.unshift(...this.#adjacencyList[next].filter(node => !visited.includes(node)));
+      console.log("Next nodes to complete (DFS): " + nodesToComplete);
+      console.log("Visited: " + visited);
     }
 
     return dfsList;

@@ -77,8 +77,13 @@ function App() {
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
-    setVisitedLog(order);
-    animateTraversal(order);
+    console.log("Order: " + order);
+    const graph = new Graph(adjacencyList.current);
+    for (const node of order) {
+      const dfsTrav = graph.dfs(node);
+      setVisitedLog(dfsTrav);
+      animateTraversal(dfsTrav);
+    }
   }
 
   // BFS: receives a starting node; records it (no search logic per requirements)
