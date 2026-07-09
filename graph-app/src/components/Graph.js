@@ -10,9 +10,9 @@ class Graph {
   // Returns a list of vertices in DFS traversal order starting from startVertex
   dfs(startVertex) {
     // Pre-order DFS Traversal
-    dfsList = [];
+    let dfsList = [];
     dfsList.push(startVertex);
-    nodesToComplete = this.#adjacencyList[startVertex].filter(node => node !== startVertex);
+    let nodesToComplete = this.#adjacencyList[startVertex].filter(node => node !== startVertex);
 
     //finish traversal by popping first node off "nodesToComplete",
     //pushing that to dfsList, and then adding that node's neighbors to
@@ -31,15 +31,21 @@ class Graph {
 
   // Returns a list of vertices in BFS traversal order starting from startVertex
   bfs(startVertex) {
-    bfsList = [];
-    notDone = [];
-    numVertices = this.getVertices().length;
-    bfsList.push(startVertex);
-    notDone.push(this.#adjacencyList[startVertex]);
-    while (notDone.length > 0 && bfsList.length < numVertices) {
+    let bfsList = [];
+    let notDone = [startVertex]; // queue for BFS
+    let visited = new Set([startVertex]); // track visited to prevent cycles
+
+    while (notDone.length > 0) {
       const curr = notDone.shift();
       bfsList.push(curr);
-      notDone.push(this.#adjacencyList[curr]);
+
+      const neighbors = this.#adjacencyList[curr] || [];
+      for (const neighbor of neighbors) {
+        if (!visited.has(neighbor)) {
+          visited.add(neighbor);
+          notDone.push(neighbor); // push individual nodes, not arrays
+        }
+      }
     }
     return bfsList;
   }
@@ -72,7 +78,7 @@ class Graph {
 
   // Returns a list of all vertices in the graph
   getVertices() {
-    return this.#adjacencyList.keys();
+    return Object.keys(this.#adjacencyList);
   }
 
   // Returns a list of neighbors for a given vertex

@@ -4,7 +4,7 @@ import Controls from './components/Controls';
 import TopBar from './components/TopBar';
 import Results from './components/Results';
 import './App.css';
-// import Graph from './Graph';
+import Graph from './components/Graph';
 
 // Initial demo graph – positions are managed by D3 force simulation
 const INITIAL_NODES = [
@@ -84,8 +84,14 @@ function App() {
   // BFS: receives a starting node; records it (no search logic per requirements)
   function handleBFS(startNode) {
     if (!startNode) return;
-    setVisitedLog([startNode]);
-    animateTraversal([startNode]);
+    
+    const graph = new Graph(adjacencyList.current);
+    const bfsTrav = graph.bfs(startNode);
+
+    console.log("BFS traversal: " + bfsTrav);
+    
+    setVisitedLog(bfsTrav);
+    animateTraversal(bfsTrav);
   }
 
   // Animate highlighting each node in sequence
