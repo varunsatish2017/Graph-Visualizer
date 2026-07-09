@@ -19,6 +19,14 @@ class Graph {
     //the start of nodesToComplete ... repeats until nodesToComplete
     //is empty
 
+    while (nodesToComplete.length > 0) {
+      const next = nodesToComplete.shift();
+      dfsList.push(next);
+      nodesToComplete.unshift(...this.#adjacencyList[next]);
+    }
+
+    return dfsList;
+
   }
 
   // Returns a list of vertices in BFS traversal order starting from startVertex
