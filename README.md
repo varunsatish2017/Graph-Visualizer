@@ -9,6 +9,10 @@ Intended to help CSE 101 students understand BFS and DFS traversal for the progr
 
 - Bottom of the page will display a log of traversals, along with a table showing discover, visit, and finish times (populated in real time during traversal)
 
+**Next Steps**
+- White (for the unvisited), Gray (for the visited), Black (for the visited + completed) node coloring during traversal
+- Replace Traversal Log with a table displaying discover and finish times for the nodes
+
 ## Sample UI
 
 ![Image](https://github.com/varunsatish2017/Graph-Visualizer/blob/main/graphUI.png)
