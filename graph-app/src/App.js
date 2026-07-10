@@ -3,6 +3,7 @@ import Canvas from './components/Canvas';
 import Controls from './components/Controls';
 import TopBar from './components/TopBar';
 import Results from './components/Results';
+import TraversalBar from './components/TraversalBar';
 import './App.css';
 import Graph from './components/Graph';
 
@@ -29,6 +30,10 @@ function App() {
   const adjacencyList = useRef({});
   const [highlightedNodeId, setHighlightedNodeId] = useState(null);
   const [visitedLog, setVisitedLog] = useState([]);
+  const [traversalList, setTraversalList] = useState([]);
+  const [currentStep, setCurrentStep] = useState(-1);
+  const [traversalMode, setTraversalMode] = useState(null); // 'dfs' | 'bfs' | null
+  const animationTimers = useRef([]);
 
   function handleAdd({ type, name, source, target }) {
     if (type === 'vertex') {
@@ -82,6 +87,9 @@ function App() {
     for (const node of order) {
       const dfsTrav = graph.dfs(node);
       setVisitedLog(dfsTrav);
+      setTraversalList(dfsTrav);
+      setCurrentStep(-1);
+      setTraversalMode('dfs');
       animateTraversal(dfsTrav);
     }
   }
@@ -94,29 +102,55 @@ function App() {
     const bfsTrav = graph.bfs(startNode);
 
     console.log("BFS traversal: " + bfsTrav);
-    
+
     setVisitedLog(bfsTrav);
+    setTraversalList(bfsTrav);
+    setCurrentStep(-1);
+    setTraversalMode('bfs');
     animateTraversal(bfsTrav);
   }
 
   // Animate highlighting each node in sequence
   function animateTraversal(order) {
+    // Cancel any in-flight animation
+    animationTimers.current.forEach(clearTimeout);
+    animationTimers.current = [];
+
     setHighlightedNodeId(null);
+    setCurrentStep(-1);
+
     order.forEach((nodeId, i) => {
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setHighlightedNodeId(nodeId);
+        setCurrentStep(i);
         if (i === order.length - 1) {
           setTimeout(() => setHighlightedNodeId(null), 800);
         }
       }, i * 800);
+      animationTimers.current.push(t);
     });
   }
 
+  // Manual scrub: user drags the slider to a specific step
+  function handleStepChange(stepIndex) {
+    // Cancel auto-play so manual control takes over immediately
+    animationTimers.current.forEach(clearTimeout);
+    animationTimers.current = [];
+
+    setCurrentStep(stepIndex);
+    setHighlightedNodeId(traversalList[stepIndex] ?? null);
+  }
+
   function handleClearAllVertices() {
+    animationTimers.current.forEach(clearTimeout);
+    animationTimers.current = [];
     setNodes([]);
     setEdges([]);
     setHighlightedNodeId(null);
     setVisitedLog([]);
+    setTraversalList([]);
+    setCurrentStep(-1);
+    setTraversalMode(null);
     adjacencyList.current = {};
 
     console.log("Adjacency list (after cleared): ", adjacencyList);
@@ -179,6 +213,12 @@ function App() {
       <div style={styles.body}>
         {/* Left: Canvas */}
         <div style={styles.canvasArea}>
+          <TraversalBar
+            traversalList={traversalList}
+            currentStep={currentStep}
+            onStepChange={handleStepChange}
+            mode={traversalMode}
+          />
           <Canvas
             nodes={nodes}
             edges={edges}
@@ -195,7 +235,7 @@ function App() {
       </div>
 
       {/* Bottom: Results */}
-      <Results visitedLog={visitedLog} />
+      <Results visitedLog={visitedLog} traversalMode={traversalMode} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Results({ visitedLog }) {
+function Results({ visitedLog, traversalMode }) {
   return (
     <div style={styles.container}>
       <h3 style={styles.title}>Traversal Log</h3>
@@ -8,6 +8,15 @@ function Results({ visitedLog }) {
         <p style={styles.empty}>No traversal run yet. Press Play DFS or Play BFS.</p>
       ) : (
         <div style={styles.sequence}>
+          {traversalMode && (
+            <span style={{
+              ...styles.modeLabel,
+              color: traversalMode === 'bfs' ? '#2da44e' : '#6c63ff',
+              borderColor: traversalMode === 'bfs' ? '#2da44e' : '#6c63ff',
+            }}>
+              {traversalMode.toUpperCase()}:
+            </span>
+          )}
           {visitedLog.map((node, index) => (
             <span key={index} style={styles.step}>
               {index > 0 && <span style={styles.arrow}>→</span>}
@@ -61,6 +70,16 @@ const styles = {
     borderRadius: 12,
     fontSize: 13,
     fontWeight: 600,
+  },
+  modeLabel: {
+    fontWeight: 700,
+    fontSize: 13,
+    fontFamily: 'Inter, Arial, sans-serif',
+    border: '1px solid',
+    borderRadius: 4,
+    padding: '2px 7px',
+    marginRight: 4,
+    letterSpacing: 0.5,
   },
 };
 

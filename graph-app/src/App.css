@@ -2,3 +2,36 @@
 * {
   box-sizing: border-box;
 }
+
+/* Traversal slider thumb styling – color driven by --slider-accent set inline */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-accent, #6c63ff);
+  box-shadow: 0 0 8px var(--slider-accent, #6c63ff);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 14px var(--slider-accent, #6c63ff);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-accent, #6c63ff);
+  box-shadow: 0 0 8px var(--slider-accent, #6c63ff);
+  cursor: pointer;
+  border: none;
+}
+
+input[type='range']:disabled::-webkit-slider-thumb {
+  background: #444;
+  box-shadow: none;
+}
