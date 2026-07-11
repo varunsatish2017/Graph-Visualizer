@@ -9,6 +9,12 @@ Intended to help CSE 101 students understand BFS and DFS traversal for the progr
 
 - Bottom of the page will display a log of traversals, along with a table showing discover, visit, and finish times (populated in real time during traversal)
 
+- AI sidebar chat to allow user to ask questions about the graph (visual image of graph, graph nodes, edges/arcs, BFS + DFS traversals, etc. attached *beforehand*)
+
+- Login system (Firebase or AWS amplify) + Document database storage of user's graphs
+
+- Host website using Vercel or Github
+
 **Next Steps**
 - White (for the unvisited), Gray (for the visited), Black (for the visited + completed) node coloring during traversal
 - Replace Traversal Log with a table displaying discover and finish times for the nodes
