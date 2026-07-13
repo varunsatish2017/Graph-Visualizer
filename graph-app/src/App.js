@@ -33,6 +33,8 @@ function App() {
   const [traversalList, setTraversalList] = useState([]);
   const [currentStep, setCurrentStep] = useState(-1);
   const [traversalMode, setTraversalMode] = useState(null); // 'dfs' | 'bfs' | null
+  const [dfsTableData, setDfsTableData] = useState([]); // rows for the DFS traversal table
+  const [bfsTableData, setBfsTableData] = useState([]); // rows for the BFS traversal table
   const animationTimers = useRef([]);
 
   function handleAdd({ type, name, source, target }) {
@@ -91,13 +93,33 @@ function App() {
       setCurrentStep(-1);
       setTraversalMode('dfs');
       animateTraversal(dfsTrav);
+
+      // Build DFS table rows — Node and Neighbors are filled in.
+      // TODO: implement discoverTime, finishTime, parent, and colorHistory
+      // based on the DFS algorithm's bookkeeping (timestamps, π-map, color map).
+      const tableRows = dfsTrav.map((nodeId) => ({
+        node: nodeId,
+        neighbors: (adjacencyList.current[nodeId] || []).join(', ') || '—',
+
+        // ── Placeholder columns – implement these ──────────────────────
+        /** The "discovery" timestamp (d[u]) – set when the node is first visited (turned GRAY). */
+        discoverTime: null,
+        /** The "finish" timestamp (f[u]) – set when all descendants are fully explored (turned BLACK). */
+        finishTime: null,
+        /** The parent/predecessor node (π[u]) in the DFS forest. null for roots. */
+        parent: null,
+        /** Array of color states the node passed through, e.g. ['white', 'gray', 'black']. */
+        colorHistory: [],
+        // ───────────────────────────────────────────────────────────────
+      }));
+      setDfsTableData(tableRows);
     }
   }
 
-  // BFS: receives a starting node; records it (no search logic per requirements)
+  // BFS: receives a starting node
   function handleBFS(startNode) {
     if (!startNode) return;
-    
+
     const graph = new Graph(adjacencyList.current);
     const bfsTrav = graph.bfs(startNode);
 
@@ -108,6 +130,24 @@ function App() {
     setCurrentStep(-1);
     setTraversalMode('bfs');
     animateTraversal(bfsTrav);
+
+    // Build BFS table rows — Node and Neighbors are filled in.
+    // TODO: implement distance, parent, and colorHistory
+    // based on BFS bookkeeping (distance map, π-map, color map).
+    const tableRows = bfsTrav.map((nodeId) => ({
+      node: nodeId,
+      neighbors: (adjacencyList.current[nodeId] || []).join(', ') || '—',
+
+      // ── Placeholder columns – implement these ──────────────────────
+      /** Shortest-path distance (number of edges) from the BFS start node. 0 for the source. */
+      distance: null,
+      /** The parent/predecessor node (π[u]) in the BFS tree. null for the source. */
+      parent: null,
+      /** Array of color states the node passed through, e.g. ['white', 'black']. */
+      colorHistory: [],
+      // ───────────────────────────────────────────────────────────────
+    }));
+    setBfsTableData(tableRows);
   }
 
   // Animate highlighting each node in sequence
@@ -235,7 +275,7 @@ function App() {
       </div>
 
       {/* Bottom: Results */}
-      <Results visitedLog={visitedLog} traversalMode={traversalMode} />
+      <Results visitedLog={visitedLog} traversalMode={traversalMode} dfsTableData={dfsTableData} bfsTableData={bfsTableData} />
     </div>
   );
 }
