@@ -8,7 +8,7 @@ class Graph {
   }
 
   // Returns a list of vertices in DFS traversal order starting from startVertex
-  dfs(startVertex) {
+  dfs(startVertex, discoverTimes, finishTimes, parentTable) {
     // Pre-order DFS Traversal
     let dfsList = [];
     dfsList.push(startVertex);
@@ -36,10 +36,13 @@ class Graph {
   }
 
   // Returns a list of vertices in BFS traversal order starting from startVertex
-  bfs(startVertex) {
+  bfs(startVertex, distancesTable, parentsMap) {
     let bfsList = [];
     let notDone = [startVertex]; // queue for BFS
     let visited = new Set([startVertex]); // track visited to prevent cycles
+
+    distancesTable[startVertex] = 0;
+    parentsMap[startVertex] = null;
 
     while (notDone.length > 0) {
       const curr = notDone.shift();
@@ -48,6 +51,8 @@ class Graph {
       const neighbors = this.#adjacencyList[curr] || [];
       for (const neighbor of neighbors) {
         if (!visited.has(neighbor)) {
+          parentsMap[neighbor] = curr;
+          distancesTable[neighbor] = distancesTable[curr] + 1;
           visited.add(neighbor);
           notDone.push(neighbor); // push individual nodes, not arrays
         }

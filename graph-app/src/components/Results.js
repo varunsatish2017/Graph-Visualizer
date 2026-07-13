@@ -69,9 +69,8 @@ function Results({ visitedLog, traversalMode, dfsTableData, bfsTableData }) {
               <tr>
                 <th style={styles.th}>Node</th>
                 <th style={styles.th}>Adjacency List / Neighbors</th>
-                {/* TODO: implement these columns */}
-                <th style={{ ...styles.th, ...styles.placeholderTh }}>Distance</th>
-                <th style={{ ...styles.th, ...styles.placeholderTh }}>Parent</th>
+                <th style={styles.th}>Distance</th>
+                <th style={styles.th}>Parent</th>
                 <th style={{ ...styles.th, ...styles.placeholderTh }}>Color History</th>
               </tr>
             </thead>
@@ -86,15 +85,15 @@ function Results({ visitedLog, traversalMode, dfsTableData, bfsTableData }) {
                     {row.neighbors}
                   </td>
 
-                  {/* ── Placeholder columns – implement values here ── */}
-                  <td style={{ ...styles.td, ...styles.placeholderTd }}>
-                    {/* TODO: render row.distance once implemented */}
-                    {row.distance !== null ? row.distance : '—'}
+                  {/* ── Implemented columns ── */}
+                  <td style={styles.td}>
+                    {row.distance}
                   </td>
-                  <td style={{ ...styles.td, ...styles.placeholderTd }}>
-                    {/* TODO: render row.parent once implemented */}
+                  <td style={styles.td}>
                     {row.parent !== null ? row.parent : '—'}
                   </td>
+
+                  {/* ── Placeholder column – implement value here ── */}
                   <td style={{ ...styles.td, ...styles.placeholderTd }}>
                     {/* TODO: render row.colorHistory once implemented */}
                     {row.colorHistory && row.colorHistory.length > 0

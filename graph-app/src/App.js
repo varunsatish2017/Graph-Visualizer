@@ -87,7 +87,10 @@ function App() {
     console.log("Order: " + order);
     const graph = new Graph(adjacencyList.current);
     for (const node of order) {
-      const dfsTrav = graph.dfs(node);
+      let d = {}; //discover times
+      let f = {}; //finish times
+      let parents = {};
+      const dfsTrav = graph.dfs(node, d, f, parents);
       setVisitedLog(dfsTrav);
       setTraversalList(dfsTrav);
       setCurrentStep(-1);
@@ -121,7 +124,9 @@ function App() {
     if (!startNode) return;
 
     const graph = new Graph(adjacencyList.current);
-    const bfsTrav = graph.bfs(startNode);
+    let distances = {};
+    let parents = {};
+    const bfsTrav = graph.bfs(startNode, distances, parents);
 
     console.log("BFS traversal: " + bfsTrav);
 
@@ -138,11 +143,10 @@ function App() {
       node: nodeId,
       neighbors: (adjacencyList.current[nodeId] || []).join(', ') || '—',
 
-      // ── Placeholder columns – implement these ──────────────────────
       /** Shortest-path distance (number of edges) from the BFS start node. 0 for the source. */
-      distance: null,
+      distance: distances[nodeId],
       /** The parent/predecessor node (π[u]) in the BFS tree. null for the source. */
-      parent: null,
+      parent: parents[nodeId],
       /** Array of color states the node passed through, e.g. ['white', 'black']. */
       colorHistory: [],
       // ───────────────────────────────────────────────────────────────
