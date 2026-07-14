@@ -22,10 +22,19 @@ class Graph {
     console.log("Inital nodes to complete (DFS): " + nodesToComplete);
     let visited = [startVertex];
 
+    let time = 1; //keeps track of discover and finish times
+
     while (nodesToComplete.length > 0) {
       const next = nodesToComplete.shift();
+      discoverTimes[next] = time;
+      time += 1;
+
       visited.push(next);
       dfsList.push(next);
+
+      //If "next"s adj is empty OR all neighbors are in visited...
+      //then finishTimes[next] = time AND time += 1
+
       nodesToComplete.unshift(...this.#adjacencyList[next].filter(node => !visited.includes(node)));
       console.log("Next nodes to complete (DFS): " + nodesToComplete);
       console.log("Visited: " + visited);
