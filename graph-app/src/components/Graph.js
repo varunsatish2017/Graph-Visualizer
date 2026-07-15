@@ -12,33 +12,58 @@ class Graph {
     // Pre-order DFS Traversal
     let dfsList = [];
     dfsList.push(startVertex);
-    let nodesToComplete = this.#adjacencyList[startVertex].filter(node => node !== startVertex);
+    
+    let nodesToFinish = this.#adjacencyList[startVertex].filter(node => node !== startVertex);
+    nodesToFinish.push(startVertex);
 
     //finish traversal by popping first node off "nodesToComplete",
     //pushing that to dfsList, and then adding that node's neighbors to
     //the start of nodesToComplete ... repeats until nodesToComplete
     //is empty
 
-    console.log("Inital nodes to complete (DFS): " + nodesToComplete);
+    console.log("Inital nodes to complete (DFS): " + nodesToFinish);
     let visited = [startVertex];
 
     let time = 1; //keeps track of discover and finish times
+    discoverTimes[startVertex] = time;
+    time += 1;
 
-    while (nodesToComplete.length > 0) {
-      const next = nodesToComplete.shift();
-      discoverTimes[next] = time;
+    let finished = [];
+    if (nodesToFinish.length === 0) {
+      finishTimes[startVertex] = time;
+      finished.push(startVertex);
       time += 1;
+    }
 
-      visited.push(next);
-      dfsList.push(next);
+    //NEW Approach: Only pop from list when node is finished, not 
+    //just discovered
+
+    while (nodesToFinish.length > 0) {
+      const next = nodesToFinish[0];
+      if (!visited.includes(next)) {
+        discoverTimes[next] = time;
+        time += 1;
+        visited.push(next);
+        dfsList.push(next);
+      }
 
       //If "next"s adj is empty OR all neighbors are in visited...
       //then finishTimes[next] = time AND time += 1
+      if (this.#adjacencyList[next].length === 0 || 
+          this.#adjacencyList[next].every(neighbor => finished.includes(neighbor))
+      ) {
+        finishTimes[next] = time;
+        nodesToFinish.shift();
+        finished.push(next);
+        time += 1;
+      }
 
-      nodesToComplete.unshift(...this.#adjacencyList[next].filter(node => !visited.includes(node)));
-      console.log("Next nodes to complete (DFS): " + nodesToComplete);
+      nodesToFinish.unshift(...this.#adjacencyList[next].filter(node => !visited.includes(node)));
+      console.log("Next nodes to complete (DFS): " + nodesToFinish);
       console.log("Visited: " + visited);
     }
+
+    console.log("Final DFS traversal: " + dfsList);
 
     return dfsList;
 

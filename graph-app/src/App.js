@@ -106,9 +106,9 @@ function App() {
 
         // ── Placeholder columns – implement these ──────────────────────
         /** The "discovery" timestamp (d[u]) – set when the node is first visited (turned GRAY). */
-        discoverTime: null,
+        discoverTime: d[nodeId],
         /** The "finish" timestamp (f[u]) – set when all descendants are fully explored (turned BLACK). */
-        finishTime: null,
+        finishTime: f[nodeId],
         /** The parent/predecessor node (π[u]) in the DFS forest. null for roots. */
         parent: null,
         /** Array of color states the node passed through, e.g. ['white', 'gray', 'black']. */
@@ -238,11 +238,11 @@ function App() {
     // TODO: Remove the edge/arc from the adjacency list here.
     // Go to "deleteEdgeSource"s adj list and remove "deleteEdgeTarget"
 
-    adjacencyList.current[deleteEdgeSource] = 
+    adjacencyList.current[deleteEdgeSource] =
       adjacencyList.current[deleteEdgeSource].filter(id => id !== deleteEdgeTarget);
 
     // From "deleteEdgeTarget"s adj list, remove "deleteEdgeSource" if present
-    adjacencyList.current[deleteEdgeTarget] = 
+    adjacencyList.current[deleteEdgeTarget] =
       adjacencyList.current[deleteEdgeTarget].filter(id => id !== deleteEdgeSource);
 
     setEdges((prev) =>
