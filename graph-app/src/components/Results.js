@@ -18,9 +18,8 @@ function Results({ visitedLog, traversalMode, dfsTableData, bfsTableData }) {
               <tr>
                 <th style={styles.th}>Node</th>
                 <th style={styles.th}>Adjacency List / Neighbors</th>
-                {/* TODO: implement these columns */}
-                <th style={{ ...styles.th, ...styles.placeholderTh }}>Discover Time</th>
-                <th style={{ ...styles.th, ...styles.placeholderTh }}>Finish Time</th>
+                <th style={styles.th}>Discover Time</th>
+                <th style={styles.th}>Finish Time</th>
                 <th style={{ ...styles.th, ...styles.placeholderTh }}>Parent</th>
                 <th style={{ ...styles.th, ...styles.placeholderTh }}>Color History</th>
               </tr>
@@ -36,15 +35,14 @@ function Results({ visitedLog, traversalMode, dfsTableData, bfsTableData }) {
                     {row.neighbors}
                   </td>
 
+                  {/* ── Implemented columns ── */}
+                  <td style={styles.td}>
+                    {row.discoverTime !== null && row.discoverTime !== undefined ? row.discoverTime : '—'}
+                  </td>
+                  <td style={styles.td}>
+                    {row.finishTime !== null && row.finishTime !== undefined ? row.finishTime : '—'}
+                  </td>
                   {/* ── Placeholder columns – implement values here ── */}
-                  <td style={{ ...styles.td, ...styles.placeholderTd }}>
-                    {/* TODO: render row.discoverTime once implemented */}
-                    {row.discoverTime !== null ? row.discoverTime : '—'}
-                  </td>
-                  <td style={{ ...styles.td, ...styles.placeholderTd }}>
-                    {/* TODO: render row.finishTime once implemented */}
-                    {row.finishTime !== null ? row.finishTime : '—'}
-                  </td>
                   <td style={{ ...styles.td, ...styles.placeholderTd }}>
                     {/* TODO: render row.parent once implemented */}
                     {row.parent !== null ? row.parent : '—'}

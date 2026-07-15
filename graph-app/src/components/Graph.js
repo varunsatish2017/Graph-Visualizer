@@ -50,7 +50,7 @@ class Graph {
       //If "next"s adj is empty OR all neighbors are in visited...
       //then finishTimes[next] = time AND time += 1
       if (this.#adjacencyList[next].length === 0 || 
-          this.#adjacencyList[next].every(neighbor => finished.includes(neighbor))
+          this.#adjacencyList[next].every(neighbor => visited.includes(neighbor))
       ) {
         finishTimes[next] = time;
         nodesToFinish.shift();
@@ -61,6 +61,7 @@ class Graph {
       nodesToFinish.unshift(...this.#adjacencyList[next].filter(node => !visited.includes(node)));
       console.log("Next nodes to complete (DFS): " + nodesToFinish);
       console.log("Visited: " + visited);
+      console.log("Finished: " + finished);
     }
 
     console.log("Final DFS traversal: " + dfsList);
