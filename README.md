@@ -13,6 +13,8 @@ Intended to help CSE 101 students understand BFS and DFS traversal for the progr
 
 - Login system (Firebase or AWS amplify) + Document database storage of user's graphs
 
+- Allow a Graph to be shared via link
+
 - Host website using Vercel or Github
 
 **Next Steps**
