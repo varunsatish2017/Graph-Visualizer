@@ -110,7 +110,7 @@ function App() {
         /** The "finish" timestamp (f[u]) – set when all descendants are fully explored (turned BLACK). */
         finishTime: f[nodeId],
         /** The parent/predecessor node (π[u]) in the DFS forest. null for roots. */
-        parent: null,
+        parent: parents[nodeId],
         /** Array of color states the node passed through, e.g. ['white', 'gray', 'black']. */
         colorHistory: [],
         // ───────────────────────────────────────────────────────────────

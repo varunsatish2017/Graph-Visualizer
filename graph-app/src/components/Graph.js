@@ -9,11 +9,13 @@ class Graph {
 
   // Returns a list of vertices in DFS traversal order starting from startVertex
   dfs(startVertex, discoverTimes, finishTimes, parentTable) {
-    // Pre-order DFS Traversal
     let dfsList = [];
     dfsList.push(startVertex);
     
     let nodesToFinish = this.#adjacencyList[startVertex].filter(node => node !== startVertex);
+    for (const neighbor of nodesToFinish) {
+      parentTable[neighbor] = startVertex;
+    }
     nodesToFinish.push(startVertex);
 
     //finish traversal by popping first node off "nodesToComplete",
@@ -38,30 +40,42 @@ class Graph {
     //NEW Approach: Only pop from list when node is finished, not 
     //just discovered
 
+    parentTable[startVertex] = null;
+
     while (nodesToFinish.length > 0) {
-      const next = nodesToFinish[0];
-      if (!visited.includes(next)) {
-        discoverTimes[next] = time;
+      const curr = nodesToFinish[0];
+      console.log("Next: " + curr);
+      if (!visited.includes(curr)) {
+        discoverTimes[curr] = time;
         time += 1;
-        visited.push(next);
-        dfsList.push(next);
+        visited.push(curr);
+        dfsList.push(curr);
       }
 
       //If "next"s adj is empty OR all neighbors are in visited...
       //then finishTimes[next] = time AND time += 1
-      if (this.#adjacencyList[next].length === 0 || 
-          this.#adjacencyList[next].every(neighbor => visited.includes(neighbor))
+      if (this.#adjacencyList[curr].length === 0 || 
+          this.#adjacencyList[curr].every(neighbor => visited.includes(neighbor))
       ) {
-        finishTimes[next] = time;
+        finishTimes[curr] = time;
         nodesToFinish.shift();
-        finished.push(next);
+        finished.push(curr);
         time += 1;
       }
 
-      nodesToFinish.unshift(...this.#adjacencyList[next].filter(node => !visited.includes(node)));
+      const unvisitedNeighbors = this.#adjacencyList[curr].filter(node => !visited.includes(node));
+      for (const neighbor of unvisitedNeighbors) {
+        //this loop will overwrite a node's parent such that its parent
+        //is the latest one that "reached it"
+        parentTable[neighbor] = curr;
+        console.log(neighbor + " new parent: " + curr);
+      }
+
+      nodesToFinish.unshift(...unvisitedNeighbors);
       console.log("Next nodes to complete (DFS): " + nodesToFinish);
       console.log("Visited: " + visited);
       console.log("Finished: " + finished);
+
     }
 
     console.log("Final DFS traversal: " + dfsList);

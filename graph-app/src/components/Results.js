@@ -20,7 +20,7 @@ function Results({ visitedLog, traversalMode, dfsTableData, bfsTableData }) {
                 <th style={styles.th}>Adjacency List / Neighbors</th>
                 <th style={styles.th}>Discover Time</th>
                 <th style={styles.th}>Finish Time</th>
-                <th style={{ ...styles.th, ...styles.placeholderTh }}>Parent</th>
+                <th style={styles.th}>Parent</th>
                 <th style={{ ...styles.th, ...styles.placeholderTh }}>Color History</th>
               </tr>
             </thead>
@@ -43,9 +43,8 @@ function Results({ visitedLog, traversalMode, dfsTableData, bfsTableData }) {
                     {row.finishTime !== null && row.finishTime !== undefined ? row.finishTime : '—'}
                   </td>
                   {/* ── Placeholder columns – implement values here ── */}
-                  <td style={{ ...styles.td, ...styles.placeholderTd }}>
-                    {/* TODO: render row.parent once implemented */}
-                    {row.parent !== null ? row.parent : '—'}
+                  <td style={styles.td}>
+                    {row.parent !== null && row.parent !== undefined ? row.parent : '—'}
                   </td>
                   <td style={{ ...styles.td, ...styles.placeholderTd }}>
                     {/* TODO: render row.colorHistory once implemented */}
