@@ -8,6 +8,13 @@ const EDGE_COLOR = '#555';
 const ARC_COLOR = '#d94a4a';
 const TEXT_COLOR = '#fff';
 
+// DFS node color states
+const DFS_COLORS = {
+  white: { fill: '#ffffff', stroke: '#888', text: '#222' },
+  gray:  { fill: '#888888', stroke: '#444', text: '#fff' },
+  black: { fill: '#1a1a1a', stroke: '#000', text: '#fff' },
+};
+
 // Helper function to draw arrow head
 function drawArrowHead(ctx, fromX, fromY, toX, toY, headSize = 8) {
   const angle = Math.atan2(toY - fromY, toX - fromX);
@@ -26,7 +33,7 @@ function drawArrowHead(ctx, fromX, fromY, toX, toY, headSize = 8) {
   ctx.stroke();
 }
 
-function drawGraph(ctx, simNodes, edges, highlightedNodeId, width, height) {
+function drawGraph(ctx, simNodes, edges, highlightedNodeId, nodeColorMap, width, height) {
   ctx.clearRect(0, 0, width, height);
 
   // Build a lookup for simulation node positions
@@ -79,15 +86,32 @@ function drawGraph(ctx, simNodes, edges, highlightedNodeId, width, height) {
   // Draw nodes
   simNodes.forEach((node) => {
     const isHighlighted = node.id === highlightedNodeId;
+    const dfsColor = nodeColorMap && nodeColorMap[node.id];
+
+    let fillColor, strokeColor, textColor;
+
+    if (dfsColor && DFS_COLORS[dfsColor]) {
+      // DFS color mode: white / gray / black
+      const palette = DFS_COLORS[dfsColor];
+      fillColor   = palette.fill;
+      strokeColor = isHighlighted ? 'gold' : palette.stroke;
+      textColor   = palette.text;
+    } else {
+      // Default / BFS mode
+      fillColor   = isHighlighted ? HIGHLIGHTED_COLOR : NODE_COLOR;
+      strokeColor = '#333';
+      textColor   = isHighlighted ? '#333' : TEXT_COLOR;
+    }
+
     ctx.beginPath();
     ctx.arc(node.x, node.y, NODE_RADIUS, 0, 2 * Math.PI);
-    ctx.fillStyle = isHighlighted ? HIGHLIGHTED_COLOR : NODE_COLOR;
+    ctx.fillStyle = fillColor;
     ctx.fill();
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = isHighlighted ? 2.5 : 1.5;
     ctx.stroke();
 
-    ctx.fillStyle = isHighlighted ? '#333' : TEXT_COLOR;
+    ctx.fillStyle = textColor;
     ctx.font = 'bold 13px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -99,6 +123,7 @@ function Canvas({
   nodes,
   edges,
   highlightedNodeId,
+  nodeColorMap,
   onClearAllVertices,
   onClearAllEdges,
 }) {
@@ -137,19 +162,19 @@ function Canvas({
         node.x = Math.max(NODE_RADIUS, Math.min(width - NODE_RADIUS, node.x));
         node.y = Math.max(NODE_RADIUS, Math.min(height - NODE_RADIUS, node.y));
       });
-      drawGraph(ctx, simNodes, edges, highlightedNodeId, width, height);
+      drawGraph(ctx, simNodes, edges, highlightedNodeId, nodeColorMap, width, height);
     });
 
     // Run and stop after convergence
     simulation.on('end', () => {
-      drawGraph(ctx, simNodes, edges, highlightedNodeId, width, height);
+      drawGraph(ctx, simNodes, edges, highlightedNodeId, nodeColorMap, width, height);
     });
 
     return () => simulation.stop();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, edges]);
 
-  // Redraw immediately when only highlighting changes (no re-simulation needed)
+  // Redraw immediately when highlighting or node colors change (no re-simulation needed)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !simRef.current) return;
@@ -160,10 +185,11 @@ function Canvas({
       simRef.current.nodes(),
       edges,
       highlightedNodeId,
+      nodeColorMap,
       canvas.width,
       canvas.height
     );
-  }, [highlightedNodeId, edges]);
+  }, [highlightedNodeId, nodeColorMap, edges]);
 
   return (
     <div style={styles.wrapper}>

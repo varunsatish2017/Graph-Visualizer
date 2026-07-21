@@ -7,7 +7,9 @@ class Graph {
     this.#adjacencyList = adjList;
   }
 
-  // Returns a list of vertices in DFS traversal order starting from startVertex
+  // Returns { dfsList, events } where events is a chronologically-sorted
+  // array of { node, type: 'discover'|'finish', time } entries.
+  // discoverTimes and finishTimes are populated as side-effects (same as before).
   dfs(startVertex, discoverTimes, finishTimes, parentTable) {
     let dfsList = [];
     dfsList.push(startVertex);
@@ -18,27 +20,22 @@ class Graph {
     }
     nodesToFinish.push(startVertex);
 
-    //finish traversal by popping first node off "nodesToComplete",
-    //pushing that to dfsList, and then adding that node's neighbors to
-    //the start of nodesToComplete ... repeats until nodesToComplete
-    //is empty
-
     console.log("Inital nodes to complete (DFS): " + nodesToFinish);
     let visited = [startVertex];
 
     let time = 1; //keeps track of discover and finish times
     discoverTimes[startVertex] = time;
+    // Record discover event for startVertex
+    const events = [{ node: startVertex, type: 'discover', time }];
     time += 1;
 
     let finished = [];
     if (nodesToFinish.length === 0) {
       finishTimes[startVertex] = time;
+      events.push({ node: startVertex, type: 'finish', time });
       finished.push(startVertex);
       time += 1;
     }
-
-    //NEW Approach: Only pop from list when node is finished, not 
-    //just discovered
 
     parentTable[startVertex] = null;
 
@@ -47,6 +44,7 @@ class Graph {
       console.log("Next: " + curr);
       if (!visited.includes(curr)) {
         discoverTimes[curr] = time;
+        events.push({ node: curr, type: 'discover', time });
         time += 1;
         visited.push(curr);
         dfsList.push(curr);
@@ -58,6 +56,7 @@ class Graph {
           this.#adjacencyList[curr].every(neighbor => visited.includes(neighbor))
       ) {
         finishTimes[curr] = time;
+        events.push({ node: curr, type: 'finish', time });
         nodesToFinish.shift();
         finished.push(curr);
         time += 1;
@@ -65,23 +64,25 @@ class Graph {
 
       const unvisitedNeighbors = this.#adjacencyList[curr].filter(node => !visited.includes(node));
       for (const neighbor of unvisitedNeighbors) {
-        //this loop will overwrite a node's parent such that its parent
-        //is the latest one that "reached it"
-        parentTable[neighbor] = curr;
-        console.log(neighbor + " new parent: " + curr);
+        if (!visited.includes(neighbor)) {
+          parentTable[neighbor] = curr;
+          console.log(neighbor + " new parent: " + curr);
+        }
       }
 
       nodesToFinish.unshift(...unvisitedNeighbors);
       console.log("Next nodes to complete (DFS): " + nodesToFinish);
       console.log("Visited: " + visited);
       console.log("Finished: " + finished);
-
     }
 
+    // Sort events chronologically (they should already be in order, but be safe)
+    events.sort((a, b) => a.time - b.time);
+
     console.log("Final DFS traversal: " + dfsList);
+    console.log("DFS events: ", events);
 
-    return dfsList;
-
+    return { dfsList, events };
   }
 
   // Returns a list of vertices in BFS traversal order starting from startVertex

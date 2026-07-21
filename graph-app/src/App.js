@@ -35,6 +35,9 @@ function App() {
   const [traversalMode, setTraversalMode] = useState(null); // 'dfs' | 'bfs' | null
   const [dfsTableData, setDfsTableData] = useState([]); // rows for the DFS traversal table
   const [bfsTableData, setBfsTableData] = useState([]); // rows for the BFS traversal table
+  const [nodeColorMap, setNodeColorMap] = useState({}); // nodeId -> 'white'|'gray'|'black'
+  const [dfsEvents, setDfsEvents] = useState([]); // chronological discover/finish events
+  const colorStepsRef = useRef([]); // snapshot of nodeColorMap at each event step
   const animationTimers = useRef([]);
 
   function handleAdd({ type, name, source, target }) {
@@ -90,30 +93,44 @@ function App() {
       let d = {}; //discover times
       let f = {}; //finish times
       let parents = {};
-      const dfsTrav = graph.dfs(node, d, f, parents);
-      setVisitedLog(dfsTrav);
-      setTraversalList(dfsTrav);
+      const { dfsList, events } = graph.dfs(node, d, f, parents);
+
+      // Initialize all nodes to white, then replay events to build per-step snapshots
+      const allNodes = Object.keys(adjacencyList.current);
+      const baseColors = {};
+      allNodes.forEach((n) => { baseColors[n] = 'white'; });
+
+      // Build a color snapshot for each event (discover → gray, finish → black)
+      const steps = events.map((evt, idx) => {
+        // Apply all events up to and including idx
+        const snapshot = { ...baseColors };
+        for (let i = 0; i <= idx; i++) {
+          const e = events[i];
+          if (e.type === 'discover') snapshot[e.node] = 'gray';
+          else snapshot[e.node] = 'black';
+        }
+        return { event: evt, colors: snapshot };
+      });
+
+      colorStepsRef.current = steps;
+      setDfsEvents(events);
+      setVisitedLog(dfsList);
+      setTraversalList(events.map(e => e.node)); // progress bar follows event order
       setCurrentStep(-1);
       setTraversalMode('dfs');
-      animateTraversal(dfsTrav);
+      // Set all nodes to white immediately
+      setNodeColorMap({ ...baseColors });
+      setHighlightedNodeId(null);
+      animateDFS(steps);
 
-      // Build DFS table rows — Node and Neighbors are filled in.
-      // TODO: implement discoverTime, finishTime, parent, and colorHistory
-      // based on the DFS algorithm's bookkeeping (timestamps, π-map, color map).
-      const tableRows = dfsTrav.map((nodeId) => ({
+      // Build DFS table rows
+      const tableRows = dfsList.map((nodeId) => ({
         node: nodeId,
         neighbors: (adjacencyList.current[nodeId] || []).join(', ') || '—',
-
-        // ── Placeholder columns – implement these ──────────────────────
-        /** The "discovery" timestamp (d[u]) – set when the node is first visited (turned GRAY). */
         discoverTime: d[nodeId],
-        /** The "finish" timestamp (f[u]) – set when all descendants are fully explored (turned BLACK). */
         finishTime: f[nodeId],
-        /** The parent/predecessor node (π[u]) in the DFS forest. null for roots. */
         parent: parents[nodeId],
-        /** Array of color states the node passed through, e.g. ['white', 'gray', 'black']. */
-        colorHistory: [],
-        // ───────────────────────────────────────────────────────────────
+        colorHistory: ['white', 'gray', 'black'],
       }));
       setDfsTableData(tableRows);
     }
@@ -154,7 +171,28 @@ function App() {
     setBfsTableData(tableRows);
   }
 
-  // Animate highlighting each node in sequence
+  // Animate DFS color steps (discover → gray, finish → black)
+  function animateDFS(steps) {
+    animationTimers.current.forEach(clearTimeout);
+    animationTimers.current = [];
+
+    setHighlightedNodeId(null);
+    setCurrentStep(-1);
+
+    steps.forEach((step, i) => {
+      const t = setTimeout(() => {
+        setNodeColorMap({ ...step.colors });
+        setHighlightedNodeId(step.event.node);
+        setCurrentStep(i);
+        if (i === steps.length - 1) {
+          setTimeout(() => setHighlightedNodeId(null), 800);
+        }
+      }, i * 800);
+      animationTimers.current.push(t);
+    });
+  }
+
+  // Animate highlighting each node in sequence (BFS / generic)
   function animateTraversal(order) {
     // Cancel any in-flight animation
     animationTimers.current.forEach(clearTimeout);
@@ -182,7 +220,17 @@ function App() {
     animationTimers.current = [];
 
     setCurrentStep(stepIndex);
-    setHighlightedNodeId(traversalList[stepIndex] ?? null);
+
+    // If we're in DFS mode, apply the color snapshot for this step
+    if (traversalMode === 'dfs' && colorStepsRef.current.length > 0) {
+      const step = colorStepsRef.current[stepIndex];
+      if (step) {
+        setNodeColorMap({ ...step.colors });
+        setHighlightedNodeId(step.event.node);
+      }
+    } else {
+      setHighlightedNodeId(traversalList[stepIndex] ?? null);
+    }
   }
 
   function handleClearAllVertices() {
@@ -195,6 +243,9 @@ function App() {
     setTraversalList([]);
     setCurrentStep(-1);
     setTraversalMode(null);
+    setNodeColorMap({});
+    setDfsEvents([]);
+    colorStepsRef.current = [];
     adjacencyList.current = {};
 
     console.log("Adjacency list (after cleared): ", adjacencyList);
@@ -262,11 +313,13 @@ function App() {
             currentStep={currentStep}
             onStepChange={handleStepChange}
             mode={traversalMode}
+            dfsEvents={dfsEvents}
           />
           <Canvas
             nodes={nodes}
             edges={edges}
             highlightedNodeId={highlightedNodeId}
+            nodeColorMap={traversalMode === 'dfs' ? nodeColorMap : {}}
             onClearAllVertices={handleClearAllVertices}
             onClearAllEdges={handleClearAllEdges}
           />
